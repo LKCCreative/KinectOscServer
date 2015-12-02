@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 #include "ofxKinectForWindows2.h"
+#include "BodyExtensions.h"
 
 class ofApp : public ofBaseApp{
 

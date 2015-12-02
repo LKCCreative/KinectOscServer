@@ -16,7 +16,7 @@ void ofApp::setup() {
 
 	sender.setup("localhost", 8000);
 
-	ofSetFrameRate(4);
+	ofSetFrameRate(12);
 }
 
 //--------------------------------------------------------------
@@ -28,8 +28,11 @@ void ofApp::update() {
 	//OSC address format --> /body{0}/skeleton or /body{0}/gesture .format(bodyIndex)
 	//Unity will parse the body # to track individual skels
 
-	ofVec3f & p = kinect.getBodySource()->getHeadPositions();
+	auto* myBod =  static_cast<ofxKFW2::Source::CustomBody*>(kinect.getBodySource().get());
 
+	ofVec3f & p = myBod->getHeadPositions();
+
+	
 	ofxOscBundle bundle;
 	ofxOscMessage m;
 	m.setAddress("/skeleton/head");
@@ -38,6 +41,7 @@ void ofApp::update() {
 	m.addFloatArg(p.z);
 	bundle.addMessage(m);
 	sender.sendBundle(bundle);
+	
 	
 }
 
