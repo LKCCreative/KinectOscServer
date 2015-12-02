@@ -1,5 +1,4 @@
 /bin
 *.vcxproj*
-*.sln
 /.vs
 *.sdf
