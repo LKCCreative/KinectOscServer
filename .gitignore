@@ -1,4 +1,2 @@
 /bin
-*.vcxproj*
-/.vs
 *.sdf
