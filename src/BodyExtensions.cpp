@@ -6,28 +6,37 @@ namespace ofxKinectForWindows2 {
 	namespace Source {
 
 		//----------
-		ofVec3f CustomBody::getHeadPositions() {
+		vector<bodyData> CustomBody::getBodyData() {
 
 			const auto & bonesAtlas = Data::Body::getBonesAtlas();
 
-			ofVec3f pos = ofVec3f();
+			vector<bodyData> bodiesData;
+
+			
 
 			for (auto & body : bodies) {
 				if (!body.tracked) continue;
+				
 
-				map<JointType, ofVec2f> jntsProj;
-
+				//populate positions
+				vector<ofVec3f> positions;
 				for (auto & j : body.joints) {
-
 					//print the joint location (3d)
 					if (j.second.getType() == JointType_Head) {
-						pos = j.second.getPosition();
+						positions.push_back(j.second.getPosition());
 					}
-
 				}
+
+				bodyData data;
+				data.id = body.trackingId;
+				data.positions = positions;
+
+				bodiesData.push_back(data);
 			}
 
-			return pos;
+
+			return bodiesData;
 		}
+
 	}
 }

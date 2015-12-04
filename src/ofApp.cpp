@@ -14,7 +14,16 @@ void ofApp::setup() {
 
 	ofSetWindowShape(previewWidth * 2, previewHeight * 2);
 
-	sender.setup("localhost", 8000);
+	string HOST, PORT;
+
+	//load info from the config and store it
+	ifstream config;
+	config.open(ofToDataPath("config.txt").c_str());
+	config >> HOST >> PORT;
+	config.close();
+	
+	sender.setup(HOST, stoi(PORT));
+	//sender.setup("localhost", 9000);
 
 	ofSetFrameRate(12);
 }
@@ -26,20 +35,43 @@ void ofApp::update() {
 
 	//send kinect skeleton data via OSC -->
 	//OSC address format --> /body{0}/skeleton or /body{0}/gesture .format(bodyIndex)
-	//Unity will parse the body # to track individual skels
+	//Unity will parse the body # to match gestures to body position
 
-	auto* myBod =  static_cast<ofxKFW2::Source::CustomBody*>(kinect.getBodySource().get());
+	auto* myBod = static_cast<ofxKFW2::Source::CustomBody*>(kinect.getBodySource().get());
 
-	ofVec3f & p = myBod->getHeadPositions();
+	vector<ofxKFW2::Source::bodyData> & data = myBod->getBodyData();
 
-	
+	//vector<gestureType> & gestures = myBod->getGesture();
+
+
 	ofxOscBundle bundle;
-	ofxOscMessage m;
-	m.setAddress("/skeleton/head");
-	m.addFloatArg(p.x);
-	m.addFloatArg(p.y);
-	m.addFloatArg(p.z);
-	bundle.addMessage(m);
+
+	//add position messages
+	for (ofxKFW2::Source::bodyData d : data) {
+		ofxOscMessage m;
+		//the address should store the index of the body being tracked
+		//does the address need to change based on which kinect we're getting the data from?
+		//or can that be surmised by the Unity app?
+		m.setAddress("/body/positions");
+		m.addIntArg(d.id);
+		//m.addIntArd(p.bodyIndex) //the body index. p needs to become a struct that holds this data
+		for (ofVec3f p : d.positions) {
+			m.addFloatArg(p.x);
+			m.addFloatArg(p.y);
+			m.addFloatArg(p.z);
+		}
+		bundle.addMessage(m);
+	}
+
+	/*
+	for (gestureType p : gestures) {
+		ofxOscMessage m;
+		m.setAddress("/body/gesture");
+		m.addIntArg(p.bodyIndex); //the body index
+		m.addStringArg(p.gestureName); //name of the gesture
+		bundle.addMessage(m);
+	}*/
+
 	sender.sendBundle(bundle);
 	
 	

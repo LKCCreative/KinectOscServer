@@ -5,11 +5,13 @@
 
 namespace ofxKinectForWindows2 {
 	namespace Source {
+
+		struct bodyData { int id; vector<ofVec3f> positions; };
+
 		// -------
 		class CustomBody : public Body {
 		public:
-			
-			ofVec3f getHeadPositions();
+			vector<bodyData> getBodyData();
 
 		};
 	}
