@@ -7,11 +7,38 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\BodyExtensions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ofApp.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxLabel.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxPanel.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp">
+      <Filter>addons\ofxGui\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscBundle.cpp">
       <Filter>addons\ofxOsc\src</Filter>
@@ -49,8 +76,8 @@
     <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp">
       <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
     </ClCompile>
-    <ClCompile Include="src\BodyExtensions.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\..\..\addons\ofxKinectBlobFinder\src\ofxKinectBlobFinder.cpp">
+      <Filter>addons\ofxKinectBlobFinder\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -59,6 +86,12 @@
     </Filter>
     <Filter Include="addons">
       <UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGui">
+      <UniqueIdentifier>{4F2A59AF-5F4E-704B-D067-EC13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGui\src">
+      <UniqueIdentifier>{645E9533-4DCD-6179-1CDF-CB65}</UniqueIdentifier>
     </Filter>
     <Filter Include="addons\ofxOsc">
       <UniqueIdentifier>{D91DCA33-6E5D-4481-2AEC-9FBB}</UniqueIdentifier>
@@ -84,13 +117,49 @@
     <Filter Include="addons\ofxOsc\libs\oscpack\src\osc">
       <UniqueIdentifier>{EDACB89C-9768-9551-4D41-B590}</UniqueIdentifier>
     </Filter>
+    <Filter Include="addons\ofxKinectBlobFinder">
+      <UniqueIdentifier>{c7e5d9e8-4966-40ec-909b-7926ae7b0fba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxKinectBlobFinder\src">
+      <UniqueIdentifier>{7f6637de-fb56-4c98-a027-b28968dc2da7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\BodyExtensions.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGui.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxLabel.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxPanel.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h">
+      <Filter>addons\ofxGui\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOsc.h">
       <Filter>addons\ofxOsc\src</Filter>
@@ -152,8 +221,11 @@
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h">
       <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
     </ClInclude>
-    <ClInclude Include="src\BodyExtensions.h">
-      <Filter>src</Filter>
+    <ClInclude Include="..\..\..\addons\ofxKinectBlobFinder\src\ofxKinectBlob.h">
+      <Filter>addons\ofxKinectBlobFinder\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxKinectBlobFinder\src\ofxKinectBlobFinder.h">
+      <Filter>addons\ofxKinectBlobFinder\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
