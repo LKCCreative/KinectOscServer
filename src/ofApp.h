@@ -26,15 +26,16 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-
 		void updateDepthImage();
-
 
 		ofxKFW2::Device kinect;
 		
 		ofxKinectBlobFinder tracker;
 
 		ofImage depthImg, bgImg, maskedImg;
+		ofFbo maskedFbo;
+
+		ofShader shaderThreshold, shaderSubtract;
 
 		ofEasyCam camera;
 

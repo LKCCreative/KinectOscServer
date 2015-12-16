@@ -18,6 +18,8 @@ void ofApp::setup() {
 
 	ofSetWindowShape(previewWidth * 2, previewHeight * 2);
 
+	ofDisableArbTex();
+
 	//the depth image to analyse
 	depthImg.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, OF_IMAGE_GRAYSCALE);
 	depthImg.setColor(ofColor::black);
@@ -32,6 +34,13 @@ void ofApp::setup() {
 	maskedImg.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, OF_IMAGE_GRAYSCALE);
 	maskedImg.setColor(ofColor::black);
 	maskedImg.update();
+
+	//maskedFbo for subtraction ops
+	maskedFbo.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, GL_RED);
+
+	//load shaders
+	shaderThreshold.load("shaders/pass.vert", "shaders/threshold.frag");
+	shaderSubtract.load("shaders/pass.vert", "shaders/subtract.frag");
 
 	//background pixel container
 	//bgPix.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, 3);
@@ -98,8 +107,6 @@ void ofApp::update() {
 	//handle blob tracking stuff
 	static bool bTrackerInit = false;
 
-	kinect.update();
-
 	// kinect 2 init is async, so just chill till it's ready, OK?
 	if (kinect.getDepthSource()->isFrameNew()) {
 		if (!bTrackerInit) {
@@ -120,6 +127,8 @@ void ofApp::update() {
 	//send kinect skeleton data via OSC -->
 	//OSC address format --> /body{0}/skeleton or /body{0}/gesture .format(bodyIndex)
 	//Unity will parse the body # to match gestures to body position
+
+	/*
 
 	auto* myBod = static_cast<ofxKFW2::Source::CustomBody*>(kinect.getBodySource().get());
 
@@ -146,16 +155,18 @@ void ofApp::update() {
 		bundle.addMessage(m);
 	}
 
-	/*
+	
 	for (gestureType p : gestures) {
 		ofxOscMessage m;
 		m.setAddress("/body/gesture");
 		m.addIntArg(p.bodyIndex); //the body index
 		m.addStringArg(p.gestureName); //name of the gesture
 		bundle.addMessage(m);
-	}*/
+	}
 
 	sender.sendBundle(bundle);
+
+	*/
 	
 	
 }
@@ -166,26 +177,20 @@ void ofApp::updateDepthImage() {
 		depthImg.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, OF_IMAGE_GRAYSCALE);
 	}
 
-	//ofShortPixels pix;
-	//pix.allocate(DEPTH_WIDTH, 1, OF_IMAGE_GRAYSCALE);
-
 	auto& depthPix = kinect.getDepthSource()->getPixels();
+	
 	for (int y = 0; y < DEPTH_HEIGHT; y++) {
 		for (int x = 0; x < DEPTH_WIDTH; x++) {
 			int index = x + (y*DEPTH_WIDTH);
-
-			// Build the 8bit, thresholded image for drawing to screen
-			if (depthPix.getWidth() && depthPix.getHeight()) {
-				// Multiply thresholds by 1000 because the values are in meters in world
-				// space but in mm in the depthPix array
-				float depth = depthPix[index];// -bgPix[index];
-				float val = depth == 0 ? 0 : ofMap(depth, thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
-				depthImg.setColor(x, y, ofColor(val));
-			}
+			// Multiply thresholds by 1000 because the values are in meters in world
+			// space but in mm in the depthPix array
+			float depth = depthPix[index];
+			float val = depth == 0 ? 0 : ofMap(depth, thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
+			depthImg.setColor(x, y, val);
 		}
 	}
-
 	depthImg.update();
+	
 
 	//update mask image (to be sent to blob tracker
 	auto d = depthImg.getPixels();
@@ -201,6 +206,8 @@ void ofApp::updateDepthImage() {
 				float diff = d[index] - b[index];
 				float val = diff > bg_tolerance ? d[index] : 0;
 				maskedImg.setColor(x, y, ofColor(val));
+
+				//this is slow, so let's do it with a shader instead. FBOs!!!
 			}
 		}
 	}
@@ -214,12 +221,12 @@ void ofApp::draw() {
 
 	if (tracker.isInited()) {
 
+		ofSetColor(255);
 		depthImg.draw(ofGetWidth() - DEPTH_WIDTH / 2., 0, DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2.);
 		bgImg.draw(ofGetWidth() - DEPTH_WIDTH, 0, DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2.);
-		maskedImg.draw(ofGetWidth() - DEPTH_WIDTH, DEPTH_HEIGHT / 2., DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2.);
+		maskedImg.draw(ofGetWidth() - DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2., DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2.);
 
-
-		glPointSize(2.0);
+		glPointSize(3.0);
 		ofPushMatrix();
 		camera.begin();
 
@@ -269,6 +276,10 @@ void ofApp::draw() {
 
 	//kinect.getBodyIndexSource()->draw(previewWidth, previewHeight, previewWidth, previewHeight);
 	//kinect.getBodySource()->drawProjected(previewWidth, previewHeight, previewWidth, previewHeight, ofxKFW2::ProjectionCoordinates::DepthCamera);
+
+	//shaderThreshold.begin();
+	//ofDrawRectangle(0, 0, 204, 204);
+	//shaderThreshold.end();
 }
 
 //--------------------------------------------------------------
@@ -279,7 +290,7 @@ void ofApp::keyPressed(int key){
 
 	if (key == 's') {
 		//save = false;
-		//gui->saveSettings("settings.xml");
+		//gui.saveToFile("settings.xml");
 	}
 	if (key == ' ') {
 		//set background thingy
