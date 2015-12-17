@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 #include "ofxGui.h"
+#include "ofxOpenCv.h"
 #include "ofxKinectBlobFinder.h"
 #include "ofxKinectForWindows2.h"
 #include "BodyExtensions.h"
@@ -34,6 +35,8 @@ class ofApp : public ofBaseApp{
 
 		ofImage depthImg, bgImg, maskedImg;
 		ofFbo maskedFbo;
+
+		ofxCvGrayscaleImage depthCv;
 
 		ofShader shaderThreshold, shaderSubtract;
 

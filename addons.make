@@ -1,3 +1,4 @@
 ofxGui
-ofxOsc
 ofxKinectBlobFinder
+ofxOpenCv
+ofxOsc

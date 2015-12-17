@@ -36,11 +36,7 @@ void ofApp::setup() {
 	maskedImg.update();
 
 	//maskedFbo for subtraction ops
-	maskedFbo.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, GL_RED);
-
-	//load shaders
-	shaderThreshold.load("shaders/pass.vert", "shaders/threshold.frag");
-	shaderSubtract.load("shaders/pass.vert", "shaders/subtract.frag");
+	//maskedFbo.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, GL_RED);
 
 	//background pixel container
 	//bgPix.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, 3);
@@ -178,40 +174,28 @@ void ofApp::updateDepthImage() {
 	}
 
 	auto& depthPix = kinect.getDepthSource()->getPixels();
+	static auto bgPix = kinect.getDepthSource()->getPixels();
 	
 	for (int y = 0; y < DEPTH_HEIGHT; y++) {
 		for (int x = 0; x < DEPTH_WIDTH; x++) {
 			int index = x + (y*DEPTH_WIDTH);
 			// Multiply thresholds by 1000 because the values are in meters in world
 			// space but in mm in the depthPix array
-			float depth = depthPix[index];
-			float val = depth == 0 ? 0 : ofMap(depth, thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
+			float bg = ofMap(bgPix[index], thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
+			float depth = ofMap(depthPix[index], thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
+			float diff = depth - bg;
+			float val = diff > bg_tolerance ?  depth : 0;
 			depthImg.setColor(x, y, val);
 		}
 	}
+
+	//maybe add some GUI controls for dilation/erosion
 	depthImg.update();
-	
-
-	//update mask image (to be sent to blob tracker
-	auto d = depthImg.getPixels();
-	auto b = bgImg.getPixels();
-	for (int y = 0; y < DEPTH_HEIGHT; y++) {
-		for (int x = 0; x < DEPTH_WIDTH; x++) {
-			int index = x + (y*DEPTH_WIDTH);
-
-			// Build the 8bit, thresholded image for drawing to screen
-			if (d.getWidth() && d.getHeight()) {
-				// Multiply thresholds by 1000 because the values are in meters in world
-				// space but in mm in the depthPix array
-				float diff = d[index] - b[index];
-				float val = diff > bg_tolerance ? d[index] : 0;
-				maskedImg.setColor(x, y, ofColor(val));
-
-				//this is slow, so let's do it with a shader instead. FBOs!!!
-			}
-		}
-	}
-
+	depthCv.setFromPixels(depthImg.getPixelsRef());
+	depthCv.dilate_3x3();
+	depthCv.erode_3x3();
+	depthCv.erode();
+	maskedImg.setFromPixels(depthCv.getPixels());
 	maskedImg.update();
 }
 
