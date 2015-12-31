@@ -34,11 +34,8 @@ class ofApp : public ofBaseApp{
 		ofxKinectBlobFinder tracker;
 
 		ofImage depthImg, bgImg, maskedImg;
-		ofFbo maskedFbo;
 
 		ofxCvGrayscaleImage depthCv;
-
-		ofPixels bgPix;
 
 		ofShader shaderThreshold, shaderSubtract;
 

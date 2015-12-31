@@ -28,19 +28,13 @@ void ofApp::setup() {
 	//background image to subtract
 	bgImg.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, OF_IMAGE_GRAYSCALE);
 	bgImg.setColor(ofColor::black);
+	bool loaded = bgImg.load("bg.png");
 	bgImg.update();
-
+	
 	//final masked image
 	maskedImg.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, OF_IMAGE_GRAYSCALE);
 	maskedImg.setColor(ofColor::black);
 	maskedImg.update();
-
-	//maskedFbo for subtraction ops
-	//maskedFbo.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, GL_RED);
-
-	//background pixel container
-	bgPix.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, 1);
-	bgPix.setColor(ofColor(0));
 
 	float sqrResolution = tracker.getResolution();
 	sqrResolution *= sqrResolution;
@@ -259,6 +253,7 @@ void ofApp::draw() {
 			ofDrawBox(tracker.blobs[i].centroid, tracker.blobs[i].dimensions.x, tracker.blobs[i].dimensions.y, tracker.blobs[i].dimensions.z);
 			ofFill();
 		}
+
 		ofSetColor(255);
 		ofDisableDepthTest();
 		camera.end();
@@ -314,6 +309,8 @@ void ofApp::keyPressed(int key){
 		}
 
 		bgImg.update();
+
+		bgImg.save("bg.png");
 		ofLog() << "Captured Background";
 	}
 }
