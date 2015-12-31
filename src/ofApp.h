@@ -38,6 +38,8 @@ class ofApp : public ofBaseApp{
 
 		ofxCvGrayscaleImage depthCv;
 
+		ofPixels bgPix;
+
 		ofShader shaderThreshold, shaderSubtract;
 
 		ofEasyCam camera;

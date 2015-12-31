@@ -39,7 +39,8 @@ void ofApp::setup() {
 	//maskedFbo.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, GL_RED);
 
 	//background pixel container
-	//bgPix.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, 3);
+	bgPix.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, 1);
+	bgPix.setColor(ofColor(0));
 
 	float sqrResolution = tracker.getResolution();
 	sqrResolution *= sqrResolution;
@@ -92,7 +93,7 @@ void ofApp::setup() {
 	sender.setup(HOST, stoi(PORT));
 	//sender.setup("localhost", 9000);
 
-	ofSetFrameRate(12);
+	ofSetFrameRate(60);
 }
 
 //--------------------------------------------------------------
@@ -174,27 +175,44 @@ void ofApp::updateDepthImage() {
 	}
 
 	auto& depthPix = kinect.getDepthSource()->getPixels();
-	static auto bgPix = kinect.getDepthSource()->getPixels();
-	
+
 	for (int y = 0; y < DEPTH_HEIGHT; y++) {
 		for (int x = 0; x < DEPTH_WIDTH; x++) {
 			int index = x + (y*DEPTH_WIDTH);
 			// Multiply thresholds by 1000 because the values are in meters in world
 			// space but in mm in the depthPix array
-			float bg = ofMap(bgPix[index], thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
-			float depth = ofMap(depthPix[index], thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
-			float diff = depth - bg;
-			float val = diff > bg_tolerance ?  depth : 0;
+			float depth = depthPix[index];
+			float val = depth == 0 ? 0 : ofMap(depth, thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
 			depthImg.setColor(x, y, val);
 		}
 	}
 
-	//maybe add some GUI controls for dilation/erosion
 	depthImg.update();
-	depthCv.setFromPixels(depthImg.getPixelsRef());
-	depthCv.dilate_3x3();
+
+	auto d = depthImg.getPixels();
+	auto b = bgImg.getPixels();
+	for (int y = 0; y < DEPTH_HEIGHT; y++) {
+		for (int x = 0; x < DEPTH_WIDTH; x++) {
+			int index = x + (y*DEPTH_WIDTH);
+
+			// Build the 8bit, thresholded image for drawing to screen
+			if (d.getWidth() && d.getHeight()) {
+				// Multiply thresholds by 1000 because the values are in meters in world
+				// space but in mm in the depthPix array
+				float diff = d[index] - b[index];
+				float val = diff > bg_tolerance ? d[index] : 0;
+				maskedImg.setColor(x, y, ofColor(val));
+			}
+		}
+	}
+
+	//maybe add some GUI controls for dilation/erosion
+	maskedImg.update();
+	depthCv.setFromPixels(maskedImg.getPixelsRef());
+	//
 	depthCv.erode_3x3();
 	depthCv.erode();
+	depthCv.dilate_3x3();
 	maskedImg.setFromPixels(depthCv.getPixels());
 	maskedImg.update();
 }
@@ -208,6 +226,7 @@ void ofApp::draw() {
 		ofSetColor(255);
 		depthImg.draw(ofGetWidth() - DEPTH_WIDTH / 2., 0, DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2.);
 		bgImg.draw(ofGetWidth() - DEPTH_WIDTH, 0, DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2.);
+
 		maskedImg.draw(ofGetWidth() - DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2., DEPTH_WIDTH / 2., DEPTH_HEIGHT / 2.);
 
 		glPointSize(3.0);
