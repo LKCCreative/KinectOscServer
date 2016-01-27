@@ -84,10 +84,10 @@ void ofApp::setup() {
 	config >> HOST >> PORT;
 	config.close();
 	
-	sender.setup(HOST, stoi(PORT));
-	//sender.setup("localhost", 9000);
+	//sender.setup(HOST, stoi(PORT));
+	sender.setup("localhost", 9000);
 
-	ofSetFrameRate(60);
+	ofSetFrameRate(10);
 }
 
 //--------------------------------------------------------------
@@ -119,7 +119,7 @@ void ofApp::update() {
 	//OSC address format --> /body{0}/skeleton or /body{0}/gesture .format(bodyIndex)
 	//Unity will parse the body # to match gestures to body position
 
-	/*
+	
 
 	auto* myBod = static_cast<ofxKFW2::Source::CustomBody*>(kinect.getBodySource().get());
 
@@ -146,7 +146,23 @@ void ofApp::update() {
 		bundle.addMessage(m);
 	}
 
-	
+	for (ofxKinectBlob blob : tracker.blobs) {
+		ofxOscMessage m;
+		//the address should store the index of the body being tracked
+		//does the address need to change based on which kinect we're getting the data from?
+		//or can that be surmised by the Unity app?
+		m.setAddress("/blob/position");
+		//this should store the ID
+		//though I think the foremost blob or the biggest blob will always be first, thanks to ofxKinectBlob
+		m.addIntArg(0);
+		//m.addIntArd(p.bodyIndex) //the body index. p needs to become a struct that holds this data
+		m.addFloatArg(blob.centroid.x);
+		m.addFloatArg(blob.centroid.y);
+		m.addFloatArg(blob.centroid.z);
+		bundle.addMessage(m);
+	}
+
+	/*
 	for (gestureType p : gestures) {
 		ofxOscMessage m;
 		m.setAddress("/body/gesture");
@@ -154,10 +170,11 @@ void ofApp::update() {
 		m.addStringArg(p.gestureName); //name of the gesture
 		bundle.addMessage(m);
 	}
+	*/
 
 	sender.sendBundle(bundle);
 
-	*/
+	
 	
 	
 }
@@ -243,6 +260,7 @@ void ofApp::draw() {
 
 			// draw blobs
 			tracker.blobs[i].draw();
+			ofLog() << tracker.blobs[i].centroid;
 
 			ofPopMatrix();
 
@@ -263,7 +281,7 @@ void ofApp::draw() {
 
 	}
 
-																	   // Color is at 1920x1080 instead of 512x424 so we should fix aspect ratio
+	// Color is at 1920x1080 instead of 512x424 so we should fix aspect ratio
 	//float colorHeight = previewWidth * (kinect.getColorSource()->getHeight() / kinect.getColorSource()->getWidth());
 	//float colorTop = (previewHeight - colorHeight) / 2.0;
 	//kinect.getColorSource()->draw(previewWidth, 0 + colorTop, previewWidth, colorHeight);
