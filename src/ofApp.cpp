@@ -260,7 +260,7 @@ void ofApp::draw() {
 
 			// draw blobs
 			tracker.blobs[i].draw();
-			ofLog() << tracker.blobs[i].centroid;
+			//ofLog() << tracker.blobs[i].centroid;
 
 			ofPopMatrix();
 
