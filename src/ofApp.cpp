@@ -1,5 +1,6 @@
 #include "ofApp.h"
 
+
 #define DEPTH_WIDTH 512
 #define DEPTH_HEIGHT 424
 #define DEPTH_SIZE DEPTH_WIDTH * DEPTH_HEIGHT
@@ -87,7 +88,11 @@ void ofApp::setup() {
 	//sender.setup(HOST, stoi(PORT));
 	sender.setup("localhost", 9000);
 
-	ofSetFrameRate(10);
+	//limit the refresh rate
+	//maybe we can limit the rates for blobs and skeletons individually
+	//so that the game can be more responsive, without costing too much cpu
+	//for now, this is okay...
+	ofSetFrameRate(40);
 }
 
 //--------------------------------------------------------------
@@ -131,19 +136,23 @@ void ofApp::update() {
 
 	//add position messages
 	for (ofxKFW2::Source::bodyData d : data) {
-		ofxOscMessage m;
+		
 		//the address should store the index of the body being tracked
 		//does the address need to change based on which kinect we're getting the data from?
 		//or can that be surmised by the Unity app?
-		m.setAddress("/body/positions");
-		m.addIntArg(d.id);
+		
 		//m.addIntArd(p.bodyIndex) //the body index. p needs to become a struct that holds this data
-		for (ofVec3f p : d.positions) {
-			m.addFloatArg(p.x);
-			m.addFloatArg(p.y);
-			m.addFloatArg(p.z);
+		for (ofxKFW2::Source::bodyPart p : d.positions) {
+			ofxOscMessage m;
+			m.setAddress("/body/positions");
+			m.addIntArg(d.id);
+			m.addIntArg(p.type);
+			m.addFloatArg(p.pos.x);
+			m.addFloatArg(p.pos.y);
+			m.addFloatArg(p.pos.z);
+			bundle.addMessage(m);
 		}
-		bundle.addMessage(m);
+		
 	}
 
 	for (ofxKinectBlob blob : tracker.blobs) {

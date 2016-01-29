@@ -12,19 +12,28 @@ namespace ofxKinectForWindows2 {
 
 			vector<bodyData> bodiesData;
 
-			
-
 			for (auto & body : bodies) {
 				if (!body.tracked) continue;
 				
 
 				//populate positions
-				vector<ofVec3f> positions;
+				vector<bodyPart> positions;
 				for (auto & j : body.joints) {
+					bodyPart p;
+					p.type = j.second.getType();
+					p.pos = j.second.getPosition();
+					positions.push_back(p);
 					//print the joint location (3d)
-					if (j.second.getType() == JointType_Head) {
+					/*
+					if (j.second.getType() == JointType_SpineShoulder) {
+						bodyPart p;
+						p.pos = j.second.getPosition()
+						positions.push_back();
+					}
+					if (j.second.getType() == JointType_HandRight) {
 						positions.push_back(j.second.getPosition());
 					}
+					*/
 				}
 
 				bodyData data;

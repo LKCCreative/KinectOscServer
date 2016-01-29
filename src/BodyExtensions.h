@@ -6,7 +6,9 @@
 namespace ofxKinectForWindows2 {
 	namespace Source {
 
-		struct bodyData { int id; vector<ofVec3f> positions; };
+		struct bodyPart { ofVec3f pos; _JointType type; };
+
+		struct bodyData { int id; vector<bodyPart> positions; };
 
 		// -------
 		class CustomBody : public Body {
