@@ -27,9 +27,13 @@ void ofApp::setup() {
 	depthImg.update();
 
 	//background image to subtract
-	bgImg.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, OF_IMAGE_GRAYSCALE);
-	bgImg.setColor(ofColor::black);
+	
+	
 	bool loaded = bgImg.load("bg.png");
+	if (!loaded) {
+		bgImg.allocate(DEPTH_WIDTH, DEPTH_HEIGHT, OF_IMAGE_GRAYSCALE);
+		bgImg.setColor(ofColor::black);
+	}
 	bgImg.update();
 	
 	//final masked image
