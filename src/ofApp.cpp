@@ -7,6 +7,8 @@
 
 int previewWidth = 640;
 int previewHeight = 480;
+//set up a file for writing the blob data
+//ofFile record;// (ofToDataPath("record.txt"), ofFile::WriteOnly);
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -88,6 +90,8 @@ void ofApp::setup() {
 	config.open(ofToDataPath("config.txt").c_str());
 	config >> HOST >> PORT;
 	config.close();
+
+	record.open(ofToDataPath("record.xml"), ofFile::WriteOnly);
 	
 	//sender.setup(HOST, stoi(PORT));
 	sender.setup("localhost", 9000);
@@ -136,6 +140,19 @@ void ofApp::update() {
 
 	//vector<gestureType> & gestures = myBod->getGesture();
 
+	//write blobs to file, if we have them, if not, write None
+	if (trackedBlobs > 0) {
+		for (ofxKinectBlob blob : tracker.blobs) {
+			record << blob.centroid << " | ";
+		}
+	}
+	else {
+		record << "nada";
+	}
+
+	record << endl;
+
+	/*
 	ofxOscBundle bundle;
 
 	//add position messages
@@ -175,6 +192,8 @@ void ofApp::update() {
 		bundle.addMessage(m);
 	}
 
+	*/
+
 	/*
 	for (gestureType p : gestures) {
 		ofxOscMessage m;
@@ -185,7 +204,7 @@ void ofApp::update() {
 	}
 	*/
 
-	sender.sendBundle(bundle);
+	//sender.sendBundle(bundle);
 
 	
 	
@@ -344,6 +363,10 @@ void ofApp::keyPressed(int key){
 		bgImg.save("bg.png");
 		ofLog() << "Captured Background";
 	}
+}
+
+void ofApp::exit(ofEventArgs &args) {
+	record.close();
 }
 
 //--------------------------------------------------------------
