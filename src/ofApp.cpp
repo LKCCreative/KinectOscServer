@@ -131,9 +131,7 @@ void ofApp::update() {
 	//send kinect skeleton data via OSC -->
 	//OSC address format --> /body{0}/skeleton or /body{0}/gesture .format(bodyIndex)
 	//Unity will parse the body # to match gestures to body position
-
 	
-
 	auto* myBod = static_cast<ofxKFW2::Source::CustomBody*>(kinect.getBodySource().get());
 
 	vector<ofxKFW2::Source::bodyData> & data = myBod->getBodyData();
@@ -147,7 +145,7 @@ void ofApp::update() {
 		}
 	}
 	else {
-		record << "nada";
+		record << "0";
 	}
 
 	record << endl;
