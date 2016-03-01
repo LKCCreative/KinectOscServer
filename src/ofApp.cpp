@@ -62,6 +62,9 @@ void ofApp::setup() {
 	minPoints.set("minPoints", 50, 0, 500);
 	maxBlobs.set("maxBlobs", 10, 0, 100);
 	trackedBlobs.set("trackdBlobs", 0, 0, maxBlobs);
+	hostip.set("Host IP", "localhost");
+	hostport.set("Host Port", 9000);
+
 
 	gui.setup("Settings", "settings.xml");
 	gui.add(thresholdNear);
@@ -76,21 +79,25 @@ void ofApp::setup() {
 	gui.add(minPoints);
 	gui.add(maxBlobs);
 	gui.add(trackedBlobs);
+	gui.add(hostip);
+	gui.add(hostport);
 	gui.loadFromFile("settings.xml");
 
 	visible = true;
 	save = false;
 
-	string HOST, PORT;
+	//string HOST, PORT;
 
 	//load info from the config and store it
+	/*
 	ifstream config;
 	config.open(ofToDataPath("config.txt").c_str());
 	config >> HOST >> PORT;
 	config.close();
+	*/
 	
 	//sender.setup(HOST, stoi(PORT));
-	sender.setup("localhost", 9000);
+	sender.setup(hostip, hostport);
 
 	//limit the refresh rate
 	//maybe we can limit the rates for blobs and skeletons individually
@@ -176,20 +183,17 @@ void ofApp::update() {
 	}
 
 	/*
+	//Gestures will be handles (interpreted) in unity...?
 	for (gestureType p : gestures) {
 		ofxOscMessage m;
 		m.setAddress("/body/gesture");
 		m.addIntArg(p.bodyIndex); //the body index
-		m.addStringArg(p.gestureName); //name of the gesture
+		m.addStringArg(p.gestureName); //name of the gesture 
 		bundle.addMessage(m);
 	}
 	*/
 
 	sender.sendBundle(bundle);
-
-	
-	
-	
 }
 
 //--------------------------------------------------------------

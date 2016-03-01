@@ -42,9 +42,11 @@ class ofApp : public ofBaseApp{
 		ofEasyCam camera;
 
 		ofxPanel gui;
-		ofParameter<int> thresh2D, minPoints, maxBlobs, trackedBlobs;
+		ofParameter<int> thresh2D, minPoints, maxBlobs, trackedBlobs, hostport;
 		ofParameter<float> thresholdNear, thresholdFar, minVol, maxVol, bg_tolerance;
 		ofParameter<ofVec3f> boxMin, boxMax, thresh3D;
+		ofParameter<string> hostip;
+
 
 		bool visible, save;
 
