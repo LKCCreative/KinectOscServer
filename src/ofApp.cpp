@@ -153,6 +153,7 @@ void ofApp::update() {
 		//or can that be surmised by the Unity app?
 		
 		//m.addIntArd(p.bodyIndex) //the body index. p needs to become a struct that holds this data
+		
 		for (ofxKFW2::Source::bodyPart p : d.positions) {
 			ofxOscMessage m;
 			m.setAddress("/body/positions");

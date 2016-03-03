@@ -14,8 +14,6 @@ namespace ofxKinectForWindows2 {
 
 			for (auto & body : bodies) {
 				if (!body.tracked) continue;
-				
-
 				//populate positions
 				vector<bodyPart> positions;
 				for (auto & j : body.joints) {
