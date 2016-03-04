@@ -97,7 +97,8 @@ void ofApp::setup() {
 	*/
 	
 	//sender.setup(HOST, stoi(PORT));
-	sender.setup(hostip, hostport);
+	//sender.setup(hostip, hostport);
+	sender.setup("10.10.10.5", 9000);
 
 	//limit the refresh rate
 	//maybe we can limit the rates for blobs and skeletons individually
@@ -153,7 +154,24 @@ void ofApp::update() {
 		//or can that be surmised by the Unity app?
 		
 		//m.addIntArd(p.bodyIndex) //the body index. p needs to become a struct that holds this data
-		
+	
+		_JointType joints[] = { _JointType::JointType_HandLeft, _JointType::JointType_HandRight, _JointType::JointType_SpineMid };
+		for (int i = 0; i < 3; i++)
+		{
+			ofxOscMessage m;
+			auto p = d.positions[joints[i]];
+			m.setAddress("/body/positions");
+			m.addIntArg(d.id);
+			m.addIntArg(p.type);
+			m.addFloatArg(p.pos.x);
+			m.addFloatArg(p.pos.y);
+			m.addFloatArg(p.pos.z);
+			bundle.addMessage(m);
+			
+		}
+
+
+		/*
 		for (ofxKFW2::Source::bodyPart p : d.positions) {
 			ofxOscMessage m;
 			m.setAddress("/body/positions");
@@ -163,7 +181,7 @@ void ofApp::update() {
 			m.addFloatArg(p.pos.y);
 			m.addFloatArg(p.pos.z);
 			bundle.addMessage(m);
-		}
+		}*/
 		
 	}
 
