@@ -90,19 +90,7 @@ void ofApp::setup() {
 	visible = true;
 	save = false;
 
-	//string HOST, PORT;
-
-	//load info from the config and store it
-	/*
-	ifstream config;
-	config.open(ofToDataPath("config.txt").c_str());
-	config >> HOST >> PORT;
-	config.close();
-	*/
-	
-	//sender.setup(HOST, stoi(PORT));
-	//sender.setup(hostip, hostport);
-	sender.setup("10.10.10.5", 9000);
+	sender.setup(hostip, hostport);
 
 	//limit the refresh rate
 	//maybe we can limit the rates for blobs and skeletons individually
