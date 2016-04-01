@@ -65,8 +65,11 @@ void ofApp::setup() {
 	hostip.set("Host IP", "localhost");
 	hostport.set("Host Port", 9000);
 
+	
+	backCap.addListener(this, &ofApp::captureBackground);
 
 	gui.setup("Settings", "settings.xml");
+	gui.add(backCap.setup("Capture Background", 20, 20));
 	gui.add(thresholdNear);
 	gui.add(thresholdFar);
 	gui.add(bg_tolerance);
@@ -79,6 +82,7 @@ void ofApp::setup() {
 	gui.add(minPoints);
 	gui.add(maxBlobs);
 	gui.add(trackedBlobs);
+
 	gui.add(hostip);
 	gui.add(hostport);
 	gui.loadFromFile("settings.xml");
@@ -104,7 +108,33 @@ void ofApp::setup() {
 	//maybe we can limit the rates for blobs and skeletons individually
 	//so that the game can be more responsive, without costing too much cpu
 	//for now, this is okay...
-	ofSetFrameRate(40);
+	ofSetFrameRate(30);
+
+
+}
+
+
+void ofApp::captureBackground(){
+	auto& bgPix = kinect.getDepthSource()->getPixels();
+	for (int y = 0; y < DEPTH_HEIGHT; y++) {
+		for (int x = 0; x < DEPTH_WIDTH; x++) {
+			int index = x + (y*DEPTH_WIDTH);
+
+			// Build the 8bit, thresholded image for drawing to screen
+			if (bgPix.getWidth() && bgPix.getHeight()) {
+				// Multiply thresholds by 1000 because the values are in meters in world
+				// space but in mm in the depthPix array
+				float depth = bgPix[index];
+				float val = depth == 0 ? 0 : ofMap(depth, thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
+				bgImg.setColor(x, y, ofColor(val));
+			}
+		}
+	}
+
+	bgImg.update();
+
+	bgImg.save("bg.png");
+	ofLog() << "Captured Background";
 }
 
 //--------------------------------------------------------------
@@ -136,13 +166,9 @@ void ofApp::update() {
 	//OSC address format --> /body{0}/skeleton or /body{0}/gesture .format(bodyIndex)
 	//Unity will parse the body # to match gestures to body position
 
-	
-
 	auto* myBod = static_cast<ofxKFW2::Source::CustomBody*>(kinect.getBodySource().get());
 
 	vector<ofxKFW2::Source::bodyData> & data = myBod->getBodyData();
-
-	//vector<gestureType> & gestures = myBod->getGesture();
 
 	ofxOscBundle bundle;
 
@@ -155,6 +181,7 @@ void ofApp::update() {
 		
 		//m.addIntArd(p.bodyIndex) //the body index. p needs to become a struct that holds this data
 	
+		//only send the following joint types, rather than the whole skeleton
 		_JointType joints[] = { _JointType::JointType_HandLeft, _JointType::JointType_HandRight, _JointType::JointType_SpineMid };
 		for (int i = 0; i < 3; i++)
 		{
@@ -170,19 +197,6 @@ void ofApp::update() {
 			
 		}
 
-
-		/*
-		for (ofxKFW2::Source::bodyPart p : d.positions) {
-			ofxOscMessage m;
-			m.setAddress("/body/positions");
-			m.addIntArg(d.id);
-			m.addIntArg(p.type);
-			m.addFloatArg(p.pos.x);
-			m.addFloatArg(p.pos.y);
-			m.addFloatArg(p.pos.z);
-			bundle.addMessage(m);
-		}*/
-		
 	}
 
 	for (ofxKinectBlob blob : tracker.blobs) {
@@ -201,16 +215,6 @@ void ofApp::update() {
 		bundle.addMessage(m);
 	}
 
-	/*
-	//Gestures will be handles (interpreted) in unity...?
-	for (gestureType p : gestures) {
-		ofxOscMessage m;
-		m.setAddress("/body/gesture");
-		m.addIntArg(p.bodyIndex); //the body index
-		m.addStringArg(p.gestureName); //name of the gesture 
-		bundle.addMessage(m);
-	}
-	*/
 
 	sender.sendBundle(bundle);
 }
@@ -249,6 +253,7 @@ void ofApp::updateDepthImage() {
 				float diff = d[index] - b[index];
 				float val = diff > bg_tolerance ? d[index] : 0;
 				maskedImg.setColor(x, y, ofColor(val));
+
 			}
 		}
 	}
@@ -313,7 +318,10 @@ void ofApp::draw() {
 		camera.end();
 		ofPopMatrix();
 
-		if (visible) gui.draw();
+		if (visible) {
+			gui.draw();
+			group.draw();
+		}
 
 	}
 
@@ -343,29 +351,6 @@ void ofApp::keyPressed(int key){
 	if (key == 's') {
 		//save = false;
 		//gui.saveToFile("settings.xml");
-	}
-	if (key == ' ') {
-		//set background thingy
-		auto& bgPix = kinect.getDepthSource()->getPixels();
-		for (int y = 0; y < DEPTH_HEIGHT; y++) {
-			for (int x = 0; x < DEPTH_WIDTH; x++) {
-				int index = x + (y*DEPTH_WIDTH);
-
-				// Build the 8bit, thresholded image for drawing to screen
-				if (bgPix.getWidth() && bgPix.getHeight()) {
-					// Multiply thresholds by 1000 because the values are in meters in world
-					// space but in mm in the depthPix array
-					float depth = bgPix[index];
-					float val = depth == 0 ? 0 : ofMap(depth, thresholdNear * 1000, thresholdFar * 1000, 255, 0, true);
-					bgImg.setColor(x, y, ofColor(val));
-				}
-			}
-		}
-
-		bgImg.update();
-
-		bgImg.save("bg.png");
-		ofLog() << "Captured Background";
 	}
 }
 
