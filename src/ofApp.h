@@ -27,6 +27,7 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void exit(ofEventArgs &args);
+		void captureBackground();
 
 		void updateDepthImage();
 
@@ -42,10 +43,16 @@ class ofApp : public ofBaseApp{
 
 		ofEasyCam camera;
 
+		ofxGuiGroup group;
+
 		ofxPanel gui;
-		ofParameter<int> thresh2D, minPoints, maxBlobs, trackedBlobs;
+		ofParameter<int> thresh2D, minPoints, maxBlobs, trackedBlobs, hostport;
 		ofParameter<float> thresholdNear, thresholdFar, minVol, maxVol, bg_tolerance;
 		ofParameter<ofVec3f> boxMin, boxMax, thresh3D;
+		ofParameter<string> hostip;
+		
+		ofxButton backCap;
+
 
 		bool visible, save;
 
